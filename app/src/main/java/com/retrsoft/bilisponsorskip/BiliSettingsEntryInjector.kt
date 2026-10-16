@@ -192,6 +192,55 @@ private class EmbeddedSettingsDialog(
         addSwitch(body, SettingsContract.KEY_SHOW_TITLE_LABEL, "在标题前显示片段标签", "按已启用的片段分类显示彩色标签", initial.showTitleLabel)
         addSwitch(body, SettingsContract.KEY_SHOW_PROGRESS_MARKERS, "在进度条标记片段", "使用分类颜色标出特殊片段所在区间", initial.showProgressMarkers)
         addSwitch(body, SettingsContract.KEY_SKIP_ON_SEEK, "快进到片段中间时仍跳过", "对应网页端的“快进到片段中间时仍然跳过”", initial.skipOnSeek)
+        addSwitch(
+            body,
+            SettingsContract.KEY_HIDE_DETAIL_AD_BANNER,
+            "隐藏视频下方广告横幅",
+            "隐藏播放器下方带“广告”和“查看详情”标识的商业卡片",
+            initial.hideDetailAdBanner,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD,
+            "跳过冷启动开屏广告",
+            "打开 B 站时直接进入首页，不等待广告倒计时",
+            initial.skipColdStartSplashAd,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD,
+            "跳过切回应用广告",
+            "从后台返回 B 站时立即关闭恢复广告",
+            initial.skipHotStartSplashAd,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_HIDE_HOME_FEED_ADS,
+            "隐藏首页信息流广告",
+            "过滤首页各频道中具有明确广告数据标记的卡片",
+            initial.hideHomeFeedAds,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB,
+            "隐藏底部会员购入口",
+            "移除底部导航中的会员购按钮，其余入口自动均分",
+            initial.hideBottomMallTab,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB,
+            "隐藏底部发布按钮",
+            "移除底部导航中间的“＋”发布按钮，其余入口自动均分",
+            initial.hideBottomPublishTab,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD,
+            "隐藏“游戏中心”卡片",
+            "移除“我的”页面中的游戏中心标题、推荐位和游戏入口",
+            initial.hideMineGameCenterCard,
+        )
         minimumDurationSpinner = spinner(MINIMUM_DURATION_LABELS).apply {
             setSelection(MINIMUM_DURATION_VALUES.indexOf(initial.minDurationSeconds).coerceAtLeast(0))
         }
@@ -312,6 +361,13 @@ private class EmbeddedSettingsDialog(
                     minimumDurationSpinner.selectedItemPosition.coerceIn(MINIMUM_DURATION_VALUES.indices)
                 ],
                 showSubmissionButton = switch(SettingsContract.KEY_SHOW_SUBMISSION_BUTTON),
+                hideDetailAdBanner = switch(SettingsContract.KEY_HIDE_DETAIL_AD_BANNER),
+                skipColdStartSplashAd = switch(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD),
+                skipHotStartSplashAd = switch(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD),
+                hideHomeFeedAds = switch(SettingsContract.KEY_HIDE_HOME_FEED_ADS),
+                hideBottomMallTab = switch(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB),
+                hideBottomPublishTab = switch(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB),
+                hideMineGameCenterCard = switch(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD),
                 username = username,
                 userId = userId,
                 categoryModes = modes,

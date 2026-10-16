@@ -70,6 +70,34 @@ class SettingsSyncReceiver : BroadcastReceiver() {
                 SettingsContract.KEY_SHOW_SUBMISSION_BUTTON,
                 defaults.showSubmissionButton,
             ),
+            hideDetailAdBanner = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_DETAIL_AD_BANNER,
+                defaults.hideDetailAdBanner,
+            ),
+            skipColdStartSplashAd = preferences.getBoolean(
+                SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD,
+                defaults.skipColdStartSplashAd,
+            ),
+            skipHotStartSplashAd = preferences.getBoolean(
+                SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD,
+                defaults.skipHotStartSplashAd,
+            ),
+            hideHomeFeedAds = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_HOME_FEED_ADS,
+                defaults.hideHomeFeedAds,
+            ),
+            hideBottomMallTab = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB,
+                defaults.hideBottomMallTab,
+            ),
+            hideBottomPublishTab = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB,
+                defaults.hideBottomPublishTab,
+            ),
+            hideMineGameCenterCard = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD,
+                defaults.hideMineGameCenterCard,
+            ),
             username = preferences.getString(SettingsContract.KEY_USERNAME, defaults.username).orEmpty().trim(),
             userId = preferences.getString(SettingsContract.KEY_USER_ID, defaults.userId).orEmpty().trim(),
             categoryModes = SettingsContract.CATEGORIES.associateWith { category ->

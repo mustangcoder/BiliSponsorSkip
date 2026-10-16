@@ -18,6 +18,13 @@ internal data class SettingsSnapshot(
     val skipOnSeek: Boolean = true,
     val minDurationSeconds: Int = 0,
     val showSubmissionButton: Boolean = false,
+    val hideDetailAdBanner: Boolean = true,
+    val skipColdStartSplashAd: Boolean = true,
+    val skipHotStartSplashAd: Boolean = true,
+    val hideHomeFeedAds: Boolean = true,
+    val hideBottomMallTab: Boolean = true,
+    val hideBottomPublishTab: Boolean = true,
+    val hideMineGameCenterCard: Boolean = true,
     val username: String = "",
     val userId: String = "",
     val categoryModes: Map<String, CategoryMode> = SettingsContract.DEFAULT_CATEGORY_MODES,
@@ -80,6 +87,13 @@ internal class SettingsRepository(
             .putBoolean(SettingsContract.KEY_SKIP_ON_SEEK, snapshot.skipOnSeek)
             .putString(SettingsContract.KEY_MIN_DURATION, snapshot.minDurationSeconds.toString())
             .putBoolean(SettingsContract.KEY_SHOW_SUBMISSION_BUTTON, snapshot.showSubmissionButton)
+            .putBoolean(SettingsContract.KEY_HIDE_DETAIL_AD_BANNER, snapshot.hideDetailAdBanner)
+            .putBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, snapshot.skipColdStartSplashAd)
+            .putBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, snapshot.skipHotStartSplashAd)
+            .putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, snapshot.hideHomeFeedAds)
+            .putBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, snapshot.hideBottomMallTab)
+            .putBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, snapshot.hideBottomPublishTab)
+            .putBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, snapshot.hideMineGameCenterCard)
             .putString(SettingsContract.KEY_USERNAME, snapshot.username)
             .putString(SettingsContract.KEY_USER_ID, snapshot.userId)
             .apply {
@@ -216,6 +230,13 @@ internal class SettingsRepository(
         minDurationSeconds = getString(SettingsContract.KEY_MIN_DURATION, "0")
             .toIntOrNull()?.coerceAtLeast(0) ?: 0,
         showSubmissionButton = getBoolean(SettingsContract.KEY_SHOW_SUBMISSION_BUTTON, false),
+        hideDetailAdBanner = getBoolean(SettingsContract.KEY_HIDE_DETAIL_AD_BANNER, true),
+        skipColdStartSplashAd = getBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, true),
+        skipHotStartSplashAd = getBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, true),
+        hideHomeFeedAds = getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, true),
+        hideBottomMallTab = getBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, true),
+        hideBottomPublishTab = getBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, true),
+        hideMineGameCenterCard = getBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, true),
         username = getString(SettingsContract.KEY_USERNAME, "").trim(),
         userId = getString(SettingsContract.KEY_USER_ID, "").trim(),
         categoryModes = SettingsContract.CATEGORIES.associateWith { category ->
@@ -260,6 +281,13 @@ internal object SettingsContract {
     const val KEY_SKIP_ON_SEEK = "skip_on_seek"
     const val KEY_MIN_DURATION = "min_duration"
     const val KEY_SHOW_SUBMISSION_BUTTON = "show_submission_button"
+    const val KEY_HIDE_DETAIL_AD_BANNER = "hide_detail_ad_banner"
+    const val KEY_SKIP_COLD_START_SPLASH_AD = "skip_cold_start_splash_ad"
+    const val KEY_SKIP_HOT_START_SPLASH_AD = "skip_hot_start_splash_ad"
+    const val KEY_HIDE_HOME_FEED_ADS = "hide_home_feed_ads"
+    const val KEY_HIDE_BOTTOM_MALL_TAB = "hide_bottom_mall_tab"
+    const val KEY_HIDE_BOTTOM_PUBLISH_TAB = "hide_bottom_publish_tab"
+    const val KEY_HIDE_MINE_GAME_CENTER_CARD = "hide_mine_game_center_card"
     const val KEY_USER_ID = "user_id"
     const val KEY_USERNAME = "username"
     const val ACTION_UPDATE_SETTINGS = "com.retrsoft.bilisponsorskip.UPDATE_SETTINGS"
@@ -335,6 +363,13 @@ internal object SettingsContract {
         putBoolean(KEY_SKIP_ON_SEEK, snapshot.skipOnSeek)
         putString(KEY_MIN_DURATION, snapshot.minDurationSeconds.toString())
         putBoolean(KEY_SHOW_SUBMISSION_BUTTON, snapshot.showSubmissionButton)
+        putBoolean(KEY_HIDE_DETAIL_AD_BANNER, snapshot.hideDetailAdBanner)
+        putBoolean(KEY_SKIP_COLD_START_SPLASH_AD, snapshot.skipColdStartSplashAd)
+        putBoolean(KEY_SKIP_HOT_START_SPLASH_AD, snapshot.skipHotStartSplashAd)
+        putBoolean(KEY_HIDE_HOME_FEED_ADS, snapshot.hideHomeFeedAds)
+        putBoolean(KEY_HIDE_BOTTOM_MALL_TAB, snapshot.hideBottomMallTab)
+        putBoolean(KEY_HIDE_BOTTOM_PUBLISH_TAB, snapshot.hideBottomPublishTab)
+        putBoolean(KEY_HIDE_MINE_GAME_CENTER_CARD, snapshot.hideMineGameCenterCard)
         putString(KEY_USERNAME, snapshot.username)
         putString(KEY_USER_ID, snapshot.userId)
         CATEGORIES.forEach { category ->
@@ -351,6 +386,13 @@ internal object SettingsContract {
         KEY_SHOW_PROGRESS_MARKERS,
         KEY_SKIP_ON_SEEK,
         KEY_SHOW_SUBMISSION_BUTTON,
+        KEY_HIDE_DETAIL_AD_BANNER,
+        KEY_SKIP_COLD_START_SPLASH_AD,
+        KEY_SKIP_HOT_START_SPLASH_AD,
+        KEY_HIDE_HOME_FEED_ADS,
+        KEY_HIDE_BOTTOM_MALL_TAB,
+        KEY_HIDE_BOTTOM_PUBLISH_TAB,
+        KEY_HIDE_MINE_GAME_CENTER_CARD,
     )
 
     val STRING_SETTING_KEYS: List<String>

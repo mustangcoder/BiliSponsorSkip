@@ -30,6 +30,8 @@ internal class SkipController(
         val showTitleLabel: Boolean,
         val showProgressMarkers: Boolean,
         val showSubmissionButton: Boolean,
+        val hideDetailAdBanner: Boolean,
+        val hideMineGameCenterCard: Boolean,
         val userId: String,
     )
 
@@ -154,6 +156,11 @@ internal class SkipController(
             showTitleLabel = preferences.enabled && preferences.showTitleLabel,
             showProgressMarkers = preferences.enabled && preferences.showProgressMarkers,
             showSubmissionButton = preferences.enabled && preferences.showSubmissionButton,
+            hideDetailAdBanner = effectiveHideDetailAdBanner(
+                moduleEnabled = preferences.enabled,
+                hideEnabled = preferences.hideDetailAdBanner,
+            ),
+            hideMineGameCenterCard = preferences.enabled && preferences.hideMineGameCenterCard,
             userId = preferences.userId,
         )
     }

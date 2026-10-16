@@ -99,7 +99,9 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         controller.syncLocalStats()
         val playerUi = PlayerUiInjector(application, controller).also(PlayerUiInjector::start)
         val submissionUi = SubmissionUiInjector(application, controller).also(SubmissionUiInjector::start)
-        uiLifecycle.attach(playerUi, submissionUi)
+        val detailAdBannerUi = DetailAdBannerUiController(controller).also(DetailAdBannerUiController::start)
+        val mineGameCenterUi = MineGameCenterUiController(controller).also(MineGameCenterUiController::start)
+        uiLifecycle.attach(playerUi, submissionUi, detailAdBannerUi, mineGameCenterUi)
         installTargetActivityHooks(lpparam.classLoader, uiLifecycle)
 
         runCatching {
@@ -109,6 +111,18 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         runCatching {
             VideoIdentityHook(lpparam.classLoader, controller).install()
         }.onFailure { Log.e("failed to install video identity hooks", it) }
+
+        runCatching {
+            SplashAdHook(settings, lpparam.classLoader).install()
+        }.onFailure { Log.e("failed to install splash ad hooks", it) }
+
+        runCatching {
+            HomeFeedAdHook(settings, lpparam.classLoader).install()
+        }.onFailure { Log.e("failed to install home feed ad filter", it) }
+
+        runCatching {
+            BottomMallTabHook(settings, lpparam.classLoader).install()
+        }.onFailure { Log.e("failed to install bottom mall tab filter", it) }
 
         Thread({
             runCatching { playerNotice.install() }
@@ -191,24 +205,43 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         @Volatile
         private var submissionUi: SubmissionUiInjector? = null
 
-        fun attach(playerUi: PlayerUiInjector, submissionUi: SubmissionUiInjector) {
+        @Volatile
+        private var detailAdBannerUi: DetailAdBannerUiController? = null
+
+        @Volatile
+        private var mineGameCenterUi: MineGameCenterUiController? = null
+
+        fun attach(
+            playerUi: PlayerUiInjector,
+            submissionUi: SubmissionUiInjector,
+            detailAdBannerUi: DetailAdBannerUiController,
+            mineGameCenterUi: MineGameCenterUiController,
+        ) {
             this.playerUi = playerUi
             this.submissionUi = submissionUi
+            this.detailAdBannerUi = detailAdBannerUi
+            this.mineGameCenterUi = mineGameCenterUi
         }
 
         fun onActivityResumed(activity: Activity) {
             playerUi?.onActivityResumed(activity)
             submissionUi?.onActivityResumed(activity)
+            detailAdBannerUi?.onActivityResumed(activity)
+            mineGameCenterUi?.onActivityResumed(activity)
         }
 
         fun onActivityPaused(activity: Activity) {
             playerUi?.onActivityPaused(activity)
             submissionUi?.onActivityPaused(activity)
+            detailAdBannerUi?.onActivityPaused(activity)
+            mineGameCenterUi?.onActivityPaused(activity)
         }
 
         fun onActivityDestroyed(activity: Activity) {
             playerUi?.onActivityDestroyed(activity)
             submissionUi?.onActivityDestroyed(activity)
+            detailAdBannerUi?.onActivityDestroyed(activity)
+            mineGameCenterUi?.onActivityDestroyed(activity)
         }
     }
 
