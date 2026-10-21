@@ -121,6 +121,27 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         }.onFailure { Log.e("failed to install home feed ad filter", it) }
 
         runCatching {
+            StoryAdFilterHook(lpparam.classLoader) {
+                val current = settings.current
+                effectiveSkipStoryFeedAds(current.enabled, current.skipStoryFeedAds)
+            }.install()
+        }.onFailure { Log.e("failed to install story ad filter", it) }
+
+        runCatching {
+            DetailRelateAdFilterHook(lpparam.classLoader) {
+                val current = settings.current
+                effectiveHideDetailRelateAds(current.enabled, current.hideDetailRelateAds)
+            }.install()
+        }.onFailure { Log.e("failed to install detail relate ad filter", it) }
+
+        runCatching {
+            PauseAdHook(lpparam.classLoader) {
+                val current = settings.current
+                effectiveHidePauseAds(current.enabled, current.hidePauseAds)
+            }.install()
+        }.onFailure { Log.e("failed to install pause ad hook", it) }
+
+        runCatching {
             BottomMallTabHook(settings, lpparam.classLoader).install()
         }.onFailure { Log.e("failed to install bottom mall tab filter", it) }
 

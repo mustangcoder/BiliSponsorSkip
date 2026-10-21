@@ -222,6 +222,27 @@ private class EmbeddedSettingsDialog(
         )
         addSwitch(
             body,
+            SettingsContract.KEY_SKIP_STORY_FEED_ADS,
+            "跳过全屏刷视频广告",
+            "过滤全屏连续播放列表中具有明确广告数据标记的视频",
+            initial.skipStoryFeedAds,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS,
+            "隐藏详情页相关推荐广告",
+            "移除视频详情页相关推荐中的商业推广卡片",
+            initial.hideDetailRelateAds,
+        )
+        addSwitch(
+            body,
+            SettingsContract.KEY_HIDE_PAUSE_ADS,
+            "隐藏暂停广告",
+            "关闭视频暂停时出现的广告面板",
+            initial.hidePauseAds,
+        )
+        addSwitch(
+            body,
             SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB,
             "隐藏底部会员购入口",
             "移除底部导航中的会员购按钮，其余入口自动均分",
@@ -365,6 +386,9 @@ private class EmbeddedSettingsDialog(
                 skipColdStartSplashAd = switch(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD),
                 skipHotStartSplashAd = switch(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD),
                 hideHomeFeedAds = switch(SettingsContract.KEY_HIDE_HOME_FEED_ADS),
+                skipStoryFeedAds = switch(SettingsContract.KEY_SKIP_STORY_FEED_ADS),
+                hideDetailRelateAds = switch(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS),
+                hidePauseAds = switch(SettingsContract.KEY_HIDE_PAUSE_ADS),
                 hideBottomMallTab = switch(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB),
                 hideBottomPublishTab = switch(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB),
                 hideMineGameCenterCard = switch(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD),

@@ -138,6 +138,12 @@ class SettingsActivity : AppCompatActivity() {
                 "从后台返回 B 站时立即关闭恢复广告", true))
             addPreference(toggle(SettingsContract.KEY_HIDE_HOME_FEED_ADS, "隐藏首页信息流广告",
                 "过滤首页各频道中具有明确广告数据标记的卡片", true))
+            addPreference(toggle(SettingsContract.KEY_SKIP_STORY_FEED_ADS, "跳过全屏刷视频广告",
+                "过滤全屏连续播放列表中具有明确广告数据标记的视频", true))
+            addPreference(toggle(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, "隐藏详情页相关推荐广告",
+                "移除视频详情页相关推荐中的商业推广卡片", true))
+            addPreference(toggle(SettingsContract.KEY_HIDE_PAUSE_ADS, "隐藏暂停广告",
+                "关闭视频暂停时出现的广告面板", true))
             addPreference(toggle(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, "隐藏底部会员购入口",
                 "移除底部导航中的会员购按钮，其余入口自动均分", true))
             addPreference(toggle(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, "隐藏底部发布按钮",
@@ -574,7 +580,12 @@ class SettingsActivity : AppCompatActivity() {
             putBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, preferences.getBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, true))
             putBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, preferences.getBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, true))
             putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, true))
+            putBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, preferences.getBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, true))
+            putBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, true))
+            putBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, true))
             putBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, preferences.getBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, true))
+            putBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, preferences.getBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, true))
+            putBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, preferences.getBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, true))
             putString(SettingsContract.KEY_USER_ID, preferences.getString(SettingsContract.KEY_USER_ID, ""))
             putString(SettingsContract.KEY_USERNAME, preferences.getString(SettingsContract.KEY_USERNAME, ""))
             SettingsContract.CATEGORIES.forEach { category ->

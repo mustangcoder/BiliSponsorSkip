@@ -22,6 +22,9 @@ internal data class SettingsSnapshot(
     val skipColdStartSplashAd: Boolean = true,
     val skipHotStartSplashAd: Boolean = true,
     val hideHomeFeedAds: Boolean = true,
+    val skipStoryFeedAds: Boolean = true,
+    val hideDetailRelateAds: Boolean = true,
+    val hidePauseAds: Boolean = true,
     val hideBottomMallTab: Boolean = true,
     val hideBottomPublishTab: Boolean = true,
     val hideMineGameCenterCard: Boolean = true,
@@ -44,6 +47,27 @@ internal enum class CategoryMode(val persistedValue: String) {
 
 internal fun SettingsSnapshot.categoryMode(category: String): CategoryMode =
     categoryModes[category] ?: CategoryMode.DISABLED
+
+internal fun SettingsSnapshot.booleanSettings(): Map<String, Boolean> = linkedMapOf(
+    SettingsContract.KEY_ENABLED to enabled,
+    SettingsContract.KEY_NOTIFY_FOUND to notifyFound,
+    SettingsContract.KEY_NOTIFY_SKIPPED to notifySkipped,
+    SettingsContract.KEY_NOTIFY_FETCH_FAILURE to notifyFetchFailure,
+    SettingsContract.KEY_SHOW_TITLE_LABEL to showTitleLabel,
+    SettingsContract.KEY_SHOW_PROGRESS_MARKERS to showProgressMarkers,
+    SettingsContract.KEY_SKIP_ON_SEEK to skipOnSeek,
+    SettingsContract.KEY_SHOW_SUBMISSION_BUTTON to showSubmissionButton,
+    SettingsContract.KEY_HIDE_DETAIL_AD_BANNER to hideDetailAdBanner,
+    SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD to skipColdStartSplashAd,
+    SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD to skipHotStartSplashAd,
+    SettingsContract.KEY_HIDE_HOME_FEED_ADS to hideHomeFeedAds,
+    SettingsContract.KEY_SKIP_STORY_FEED_ADS to skipStoryFeedAds,
+    SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS to hideDetailRelateAds,
+    SettingsContract.KEY_HIDE_PAUSE_ADS to hidePauseAds,
+    SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB to hideBottomMallTab,
+    SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB to hideBottomPublishTab,
+    SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD to hideMineGameCenterCard,
+)
 
 internal class SettingsRepository(
     private val application: Application,
@@ -91,6 +115,9 @@ internal class SettingsRepository(
             .putBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, snapshot.skipColdStartSplashAd)
             .putBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, snapshot.skipHotStartSplashAd)
             .putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, snapshot.hideHomeFeedAds)
+            .putBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, snapshot.skipStoryFeedAds)
+            .putBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, snapshot.hideDetailRelateAds)
+            .putBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, snapshot.hidePauseAds)
             .putBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, snapshot.hideBottomMallTab)
             .putBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, snapshot.hideBottomPublishTab)
             .putBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, snapshot.hideMineGameCenterCard)
@@ -234,6 +261,9 @@ internal class SettingsRepository(
         skipColdStartSplashAd = getBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, true),
         skipHotStartSplashAd = getBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, true),
         hideHomeFeedAds = getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, true),
+        skipStoryFeedAds = getBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, true),
+        hideDetailRelateAds = getBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, true),
+        hidePauseAds = getBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, true),
         hideBottomMallTab = getBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, true),
         hideBottomPublishTab = getBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, true),
         hideMineGameCenterCard = getBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, true),
@@ -285,6 +315,9 @@ internal object SettingsContract {
     const val KEY_SKIP_COLD_START_SPLASH_AD = "skip_cold_start_splash_ad"
     const val KEY_SKIP_HOT_START_SPLASH_AD = "skip_hot_start_splash_ad"
     const val KEY_HIDE_HOME_FEED_ADS = "hide_home_feed_ads"
+    const val KEY_SKIP_STORY_FEED_ADS = "skip_story_feed_ads"
+    const val KEY_HIDE_DETAIL_RELATE_ADS = "hide_detail_relate_ads"
+    const val KEY_HIDE_PAUSE_ADS = "hide_pause_ads"
     const val KEY_HIDE_BOTTOM_MALL_TAB = "hide_bottom_mall_tab"
     const val KEY_HIDE_BOTTOM_PUBLISH_TAB = "hide_bottom_publish_tab"
     const val KEY_HIDE_MINE_GAME_CENTER_CARD = "hide_mine_game_center_card"
@@ -354,22 +387,8 @@ internal object SettingsContract {
     }
 
     fun settingsBundle(snapshot: SettingsSnapshot) = Bundle().apply {
-        putBoolean(KEY_ENABLED, snapshot.enabled)
-        putBoolean(KEY_NOTIFY_FOUND, snapshot.notifyFound)
-        putBoolean(KEY_NOTIFY_SKIPPED, snapshot.notifySkipped)
-        putBoolean(KEY_NOTIFY_FETCH_FAILURE, snapshot.notifyFetchFailure)
-        putBoolean(KEY_SHOW_TITLE_LABEL, snapshot.showTitleLabel)
-        putBoolean(KEY_SHOW_PROGRESS_MARKERS, snapshot.showProgressMarkers)
-        putBoolean(KEY_SKIP_ON_SEEK, snapshot.skipOnSeek)
+        snapshot.booleanSettings().forEach(::putBoolean)
         putString(KEY_MIN_DURATION, snapshot.minDurationSeconds.toString())
-        putBoolean(KEY_SHOW_SUBMISSION_BUTTON, snapshot.showSubmissionButton)
-        putBoolean(KEY_HIDE_DETAIL_AD_BANNER, snapshot.hideDetailAdBanner)
-        putBoolean(KEY_SKIP_COLD_START_SPLASH_AD, snapshot.skipColdStartSplashAd)
-        putBoolean(KEY_SKIP_HOT_START_SPLASH_AD, snapshot.skipHotStartSplashAd)
-        putBoolean(KEY_HIDE_HOME_FEED_ADS, snapshot.hideHomeFeedAds)
-        putBoolean(KEY_HIDE_BOTTOM_MALL_TAB, snapshot.hideBottomMallTab)
-        putBoolean(KEY_HIDE_BOTTOM_PUBLISH_TAB, snapshot.hideBottomPublishTab)
-        putBoolean(KEY_HIDE_MINE_GAME_CENTER_CARD, snapshot.hideMineGameCenterCard)
         putString(KEY_USERNAME, snapshot.username)
         putString(KEY_USER_ID, snapshot.userId)
         CATEGORIES.forEach { category ->
@@ -390,6 +409,9 @@ internal object SettingsContract {
         KEY_SKIP_COLD_START_SPLASH_AD,
         KEY_SKIP_HOT_START_SPLASH_AD,
         KEY_HIDE_HOME_FEED_ADS,
+        KEY_SKIP_STORY_FEED_ADS,
+        KEY_HIDE_DETAIL_RELATE_ADS,
+        KEY_HIDE_PAUSE_ADS,
         KEY_HIDE_BOTTOM_MALL_TAB,
         KEY_HIDE_BOTTOM_PUBLISH_TAB,
         KEY_HIDE_MINE_GAME_CENTER_CARD,

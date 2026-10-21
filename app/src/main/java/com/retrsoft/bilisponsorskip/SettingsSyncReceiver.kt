@@ -86,6 +86,18 @@ class SettingsSyncReceiver : BroadcastReceiver() {
                 SettingsContract.KEY_HIDE_HOME_FEED_ADS,
                 defaults.hideHomeFeedAds,
             ),
+            skipStoryFeedAds = preferences.getBoolean(
+                SettingsContract.KEY_SKIP_STORY_FEED_ADS,
+                defaults.skipStoryFeedAds,
+            ),
+            hideDetailRelateAds = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS,
+                defaults.hideDetailRelateAds,
+            ),
+            hidePauseAds = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_PAUSE_ADS,
+                defaults.hidePauseAds,
+            ),
             hideBottomMallTab = preferences.getBoolean(
                 SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB,
                 defaults.hideBottomMallTab,
