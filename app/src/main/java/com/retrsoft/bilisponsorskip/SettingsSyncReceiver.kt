@@ -86,6 +86,10 @@ class SettingsSyncReceiver : BroadcastReceiver() {
                 SettingsContract.KEY_HIDE_HOME_FEED_ADS,
                 defaults.hideHomeFeedAds,
             ),
+            hideHomeFeedLiveCards = preferences.getBoolean(
+                SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS,
+                defaults.hideHomeFeedLiveCards,
+            ),
             skipStoryFeedAds = preferences.getBoolean(
                 SettingsContract.KEY_SKIP_STORY_FEED_ADS,
                 defaults.skipStoryFeedAds,

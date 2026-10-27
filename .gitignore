@@ -12,3 +12,4 @@ captures/
 release-secrets.txt
 dist/
 artifacts/
+tools/

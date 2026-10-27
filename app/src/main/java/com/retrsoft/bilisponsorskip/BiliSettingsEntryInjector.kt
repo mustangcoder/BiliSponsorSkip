@@ -222,6 +222,13 @@ private class EmbeddedSettingsDialog(
         )
         addSwitch(
             body,
+            SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS,
+            "隐藏首页推荐直播卡片",
+            "过滤首页推荐频道中结构化标记为直播的卡片",
+            initial.hideHomeFeedLiveCards,
+        )
+        addSwitch(
+            body,
             SettingsContract.KEY_SKIP_STORY_FEED_ADS,
             "跳过全屏刷视频广告",
             "过滤全屏连续播放列表中具有明确广告数据标记的视频",
@@ -386,6 +393,7 @@ private class EmbeddedSettingsDialog(
                 skipColdStartSplashAd = switch(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD),
                 skipHotStartSplashAd = switch(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD),
                 hideHomeFeedAds = switch(SettingsContract.KEY_HIDE_HOME_FEED_ADS),
+                hideHomeFeedLiveCards = switch(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS),
                 skipStoryFeedAds = switch(SettingsContract.KEY_SKIP_STORY_FEED_ADS),
                 hideDetailRelateAds = switch(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS),
                 hidePauseAds = switch(SettingsContract.KEY_HIDE_PAUSE_ADS),

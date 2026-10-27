@@ -247,7 +247,7 @@ Trace module preferences, mirror preferences, embedded UI, standalone UI, settin
 - Modify: `README.md`
 - Modify: `CHANGELOG.md`
 - Modify: tests only if runtime evidence exposes a missed boundary.
-- Output only: `/Users/lzm/workspace/github/block_bili_ad/output/9.15.0/bili-9.15.0-487-lspatched.apk`
+- Output only: `/Users/lzm/workspace/github/block_bili_ad/BiliSponsorSkip/output/9.15.0/bili-9.15.0-487-lspatched.apk`
 
 **Interfaces:**
 - Consumes: completed Story/detail hooks and settings.

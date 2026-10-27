@@ -4,6 +4,32 @@ import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
 
+internal fun readHomeFeedCardSignals(
+    item: Any,
+    reader: ReflectiveValueReader,
+): HomeFeedCardSignals {
+    fun call(target: Any, name: String): Any? = runCatching { reader.call(target, name) }.getOrNull()
+    fun field(target: Any, name: String): Any? = runCatching { reader.field(target, name) }.getOrNull()
+
+    val adInfo = call(item, "getAdInfo") ?: field(item, "adInfo")
+    return HomeFeedCardSignals(
+        ad = HomeFeedAdSignals(
+            isAdCard = call(item, "isAdCard") == true,
+            isAd = field(item, "isAd") == true || adInfo?.let { call(it, "isAd") } == true,
+            isAdLoc = field(item, "isAdLoc") == true || adInfo?.let { call(it, "isAdLoc") } == true,
+            cmMark = (field(item, "cmMark") as? Number)?.toInt()?.takeIf { it != 0 }
+                ?: (adInfo?.let { call(it, "getCmMark") } as? Number)?.toInt()
+                ?: 0,
+            hasAdInfo = adInfo != null,
+            adCallback = (field(item, "ad_cb") as? String)
+                ?: (adInfo?.let { call(it, "getAdCb") } as? String),
+        ),
+        goTo = (call(item, "getGoto") as? String) ?: (field(item, "goTo") as? String),
+        cardGoto = (call(item, "getCardGoto") as? String) ?: (field(item, "cardGoto") as? String),
+        uri = (call(item, "getUri") as? String) ?: (field(item, "uri") as? String),
+    )
+}
+
 internal class HomeFeedAdHook(
     private val settings: SettingsRepository,
     private val classLoader: ClassLoader,
@@ -22,10 +48,15 @@ internal class HomeFeedAdHook(
             object : XC_MethodHook() {
                 override fun afterHookedMethod(param: MethodHookParam) {
                     val current = settings.current
-                    if (!current.enabled || !current.hideHomeFeedAds) return
+                    if (!current.enabled || (!current.hideHomeFeedAds && !current.hideHomeFeedLiveCards)) return
                     @Suppress("UNCHECKED_CAST")
                     val items = param.result as? MutableList<Any?> ?: return
-                    filterInPlace(items, "parser")
+                    filterInPlace(
+                        items,
+                        "parser",
+                        hideAds = current.hideHomeFeedAds,
+                        hideLiveCards = current.hideHomeFeedLiveCards,
+                    )
                 }
             },
         )
@@ -42,7 +73,7 @@ internal class HomeFeedAdHook(
             object : XC_MethodHook() {
                 override fun beforeHookedMethod(param: MethodHookParam) {
                     val current = settings.current
-                    if (!current.enabled || !current.hideHomeFeedAds) return
+                    if (!current.enabled || (!current.hideHomeFeedAds && !current.hideHomeFeedLiveCards)) return
                     val state = runCatching {
                         XposedHelpers.getObjectField(param.thisObject, "L\$0")
                     }.getOrNull() ?: return
@@ -50,7 +81,12 @@ internal class HomeFeedAdHook(
                         @Suppress("UNCHECKED_CAST")
                         XposedHelpers.getObjectField(state, "a") as? MutableList<Any?>
                     }.getOrNull() ?: return
-                    filterInPlace(items, "adapter")
+                    filterInPlace(
+                        items,
+                        "adapter",
+                        hideAds = current.hideHomeFeedAds,
+                        hideLiveCards = current.hideHomeFeedLiveCards,
+                    )
                 }
             },
         )
@@ -58,36 +94,33 @@ internal class HomeFeedAdHook(
         Log.d("home feed adapter filter hook installed: $FEED_COLLECTOR_CLASS.invokeSuspend")
     }
 
-    private fun filterInPlace(items: MutableList<Any?>, source: String) {
-        val before = items.size
-        items.removeAll { item -> item != null && isMarkedHomeFeedAd(item.adSignals()) }
-        val removed = before - items.size
-        if (removed > 0) Log.d("home feed ads filtered: source=$source; removed=$removed; remaining=${items.size}")
-    }
-
-    private fun Any.adSignals(): HomeFeedAdSignals {
-        val adInfo = callOrNull("getAdInfo") ?: objectFieldOrNull("adInfo")
-        return HomeFeedAdSignals(
-            isAdCard = callOrNull("isAdCard") == true,
-            isAd = booleanFieldOrFalse("isAd") || adInfo?.callOrNull("isAd") == true,
-            isAdLoc = booleanFieldOrFalse("isAdLoc") || adInfo?.callOrNull("isAdLoc") == true,
-            cmMark = intFieldOrZero("cmMark").takeIf { it != 0 }
-                ?: (adInfo?.callOrNull("getCmMark") as? Number)?.toInt()
-                ?: 0,
-            hasAdInfo = adInfo != null,
-            adCallback = (objectFieldOrNull("ad_cb") as? String)
-                ?: adInfo?.callOrNull("getAdCb") as? String,
+    private fun filterInPlace(
+        items: MutableList<Any?>,
+        source: String,
+        hideAds: Boolean,
+        hideLiveCards: Boolean,
+    ) {
+        val outcome = filterHomeFeedResult(items, hideAds, hideLiveCards) { item ->
+            if (item == null) HomeFeedCardSignals() else readHomeFeedCardSignals(item, XposedHomeFeedReader)
+        }
+        if (outcome.removedAds == 0 && outcome.removedLiveCards == 0) return
+        items.clear()
+        items.addAll(outcome.items)
+        Log.d(
+            "home feed cards filtered: source=$source; ads=${outcome.removedAds}; " +
+                "live=${outcome.removedLiveCards}; remaining=${items.size}",
         )
     }
 
-    private fun Any.booleanFieldOrFalse(name: String): Boolean =
-        runCatching { XposedHelpers.getBooleanField(this, name) }.getOrDefault(false)
+    private object XposedHomeFeedReader : ReflectiveValueReader {
+        override fun call(target: Any, name: String): Any? = XposedHelpers.callMethod(target, name)
 
-    private fun Any.intFieldOrZero(name: String): Int =
-        runCatching { XposedHelpers.getIntField(this, name) }.getOrDefault(0)
-
-    private fun Any.objectFieldOrNull(name: String): Any? =
-        runCatching { XposedHelpers.getObjectField(this, name) }.getOrNull()
+        override fun field(target: Any, name: String): Any? = when (name) {
+            "isAd", "isAdLoc" -> XposedHelpers.getBooleanField(target, name)
+            "cmMark" -> XposedHelpers.getIntField(target, name)
+            else -> XposedHelpers.getObjectField(target, name)
+        }
+    }
 
     private companion object {
         const val PARSER_CLASS = "com.bilibili.pegasus.api.i"

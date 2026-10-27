@@ -138,6 +138,8 @@ class SettingsActivity : AppCompatActivity() {
                 "从后台返回 B 站时立即关闭恢复广告", true))
             addPreference(toggle(SettingsContract.KEY_HIDE_HOME_FEED_ADS, "隐藏首页信息流广告",
                 "过滤首页各频道中具有明确广告数据标记的卡片", true))
+            addPreference(toggle(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS, "隐藏首页推荐直播卡片",
+                "过滤首页推荐频道中结构化标记为直播的卡片", true))
             addPreference(toggle(SettingsContract.KEY_SKIP_STORY_FEED_ADS, "跳过全屏刷视频广告",
                 "过滤全屏连续播放列表中具有明确广告数据标记的视频", true))
             addPreference(toggle(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, "隐藏详情页相关推荐广告",
@@ -580,6 +582,7 @@ class SettingsActivity : AppCompatActivity() {
             putBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, preferences.getBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, true))
             putBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, preferences.getBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, true))
             putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, true))
+            putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS, preferences.getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS, true))
             putBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, preferences.getBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, true))
             putBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, true))
             putBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, true))

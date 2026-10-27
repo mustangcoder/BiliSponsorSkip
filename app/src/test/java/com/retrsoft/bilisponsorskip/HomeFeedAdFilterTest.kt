@@ -22,6 +22,33 @@ class HomeFeedAdFilterTest {
     }
 
     @Test
+    fun identifiesStructuredLiveSignals() {
+        assertTrue(isHomeFeedLiveCard(HomeFeedCardSignals(goTo = "live")))
+        assertTrue(isHomeFeedLiveCard(HomeFeedCardSignals(goTo = "live_rcmd")))
+        assertTrue(isHomeFeedLiveCard(HomeFeedCardSignals(cardGoto = "live")))
+        assertTrue(isHomeFeedLiveCard(HomeFeedCardSignals(cardGoto = "live_rcmd")))
+        assertTrue(isHomeFeedLiveCard(HomeFeedCardSignals(uri = "bilibili://live/12345?broadcast_type=0")))
+        assertTrue(isHomeFeedLiveCard(HomeFeedCardSignals(uri = "https://live.bilibili.com/12345")))
+    }
+
+    @Test
+    fun rejectsSimilarButNonLiveSignals() {
+        assertFalse(isHomeFeedLiveCard(HomeFeedCardSignals(goTo = null)))
+        assertFalse(isHomeFeedLiveCard(HomeFeedCardSignals(goTo = "av")))
+        assertFalse(isHomeFeedLiveCard(HomeFeedCardSignals(goTo = "vertical_live")))
+        assertFalse(isHomeFeedLiveCard(HomeFeedCardSignals(goTo = "live_room")))
+        assertFalse(isHomeFeedLiveCard(HomeFeedCardSignals(cardGoto = "live_event")))
+        assertFalse(isHomeFeedLiveCard(HomeFeedCardSignals(uri = "bilibili://video/123?tag=LIVE")))
+    }
+
+    @Test
+    fun visibleTitleIsNotPartOfLiveDetection() {
+        val ordinaryVideoWithLiveInTitle = HomeFeedCardSignals(goTo = "av")
+
+        assertFalse(isHomeFeedLiveCard(ordinaryVideoWithLiveInTitle))
+    }
+
+    @Test
     fun removesOnlyMarkedAdsFromMixedFeed() {
         val feed = listOf(
             HomeFeedEntry("video-1", HomeFeedAdSignals()),

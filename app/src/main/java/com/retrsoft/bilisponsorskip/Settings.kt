@@ -22,6 +22,7 @@ internal data class SettingsSnapshot(
     val skipColdStartSplashAd: Boolean = true,
     val skipHotStartSplashAd: Boolean = true,
     val hideHomeFeedAds: Boolean = true,
+    val hideHomeFeedLiveCards: Boolean = true,
     val skipStoryFeedAds: Boolean = true,
     val hideDetailRelateAds: Boolean = true,
     val hidePauseAds: Boolean = true,
@@ -61,6 +62,7 @@ internal fun SettingsSnapshot.booleanSettings(): Map<String, Boolean> = linkedMa
     SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD to skipColdStartSplashAd,
     SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD to skipHotStartSplashAd,
     SettingsContract.KEY_HIDE_HOME_FEED_ADS to hideHomeFeedAds,
+    SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS to hideHomeFeedLiveCards,
     SettingsContract.KEY_SKIP_STORY_FEED_ADS to skipStoryFeedAds,
     SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS to hideDetailRelateAds,
     SettingsContract.KEY_HIDE_PAUSE_ADS to hidePauseAds,
@@ -115,6 +117,7 @@ internal class SettingsRepository(
             .putBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, snapshot.skipColdStartSplashAd)
             .putBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, snapshot.skipHotStartSplashAd)
             .putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, snapshot.hideHomeFeedAds)
+            .putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS, snapshot.hideHomeFeedLiveCards)
             .putBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, snapshot.skipStoryFeedAds)
             .putBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, snapshot.hideDetailRelateAds)
             .putBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, snapshot.hidePauseAds)
@@ -261,6 +264,7 @@ internal class SettingsRepository(
         skipColdStartSplashAd = getBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, true),
         skipHotStartSplashAd = getBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, true),
         hideHomeFeedAds = getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, true),
+        hideHomeFeedLiveCards = getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS, true),
         skipStoryFeedAds = getBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, true),
         hideDetailRelateAds = getBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, true),
         hidePauseAds = getBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, true),
@@ -315,6 +319,7 @@ internal object SettingsContract {
     const val KEY_SKIP_COLD_START_SPLASH_AD = "skip_cold_start_splash_ad"
     const val KEY_SKIP_HOT_START_SPLASH_AD = "skip_hot_start_splash_ad"
     const val KEY_HIDE_HOME_FEED_ADS = "hide_home_feed_ads"
+    const val KEY_HIDE_HOME_FEED_LIVE_CARDS = "hide_home_feed_live_cards"
     const val KEY_SKIP_STORY_FEED_ADS = "skip_story_feed_ads"
     const val KEY_HIDE_DETAIL_RELATE_ADS = "hide_detail_relate_ads"
     const val KEY_HIDE_PAUSE_ADS = "hide_pause_ads"
@@ -409,6 +414,7 @@ internal object SettingsContract {
         KEY_SKIP_COLD_START_SPLASH_AD,
         KEY_SKIP_HOT_START_SPLASH_AD,
         KEY_HIDE_HOME_FEED_ADS,
+        KEY_HIDE_HOME_FEED_LIVE_CARDS,
         KEY_SKIP_STORY_FEED_ADS,
         KEY_HIDE_DETAIL_RELATE_ADS,
         KEY_HIDE_PAUSE_ADS,
