@@ -145,6 +145,10 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
             BottomMallTabHook(settings, lpparam.classLoader).install()
         }.onFailure { Log.e("failed to install bottom mall tab filter", it) }
 
+        runCatching {
+            ComposeBottomTabHook(settings, lpparam.classLoader).install()
+        }.onFailure { Log.e("failed to install compose bottom tab filter", it) }
+
         Thread({
             runCatching { playerNotice.install() }
                 .onFailure { Log.e("failed to install interactive player notice bridge", it) }

@@ -6,6 +6,18 @@ internal data class BottomTabIdentity(
     val publishType: Boolean = false,
 )
 
+internal fun readComposeBottomTabIdentity(
+    state: Any,
+    reader: ReflectiveValueReader,
+): BottomTabIdentity? = runCatching {
+    val tabData = reader.field(state, "a") ?: return null
+    BottomTabIdentity(
+        tabId = reader.field(tabData, "h") as? String,
+        uri = reader.field(tabData, "c") as? String,
+        publishType = reader.field(state, "o") == true,
+    )
+}.getOrNull()
+
 internal fun isMallBottomTab(tab: BottomTabIdentity): Boolean =
     tab.tabId == MALL_TAB_NAME || tab.uri in MALL_TAB_URIS
 
