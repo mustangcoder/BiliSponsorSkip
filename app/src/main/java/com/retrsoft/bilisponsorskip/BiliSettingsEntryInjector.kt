@@ -269,6 +269,13 @@ private class EmbeddedSettingsDialog(
             "移除“我的”页面中的游戏中心标题、推荐位和游戏入口",
             initial.hideMineGameCenterCard,
         )
+        addSwitch(
+            body,
+            SettingsContract.KEY_DISABLE_ANALYTICS_REPORTING,
+            "禁用行为统计上报",
+            "阻止点击、曝光、页面和播放器行为埋点；保留历史、心跳、支付和上传接口",
+            initial.disableAnalyticsReporting,
+        )
         minimumDurationSpinner = spinner(MINIMUM_DURATION_LABELS).apply {
             setSelection(MINIMUM_DURATION_VALUES.indexOf(initial.minDurationSeconds).coerceAtLeast(0))
         }
@@ -400,6 +407,7 @@ private class EmbeddedSettingsDialog(
                 hideBottomMallTab = switch(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB),
                 hideBottomPublishTab = switch(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB),
                 hideMineGameCenterCard = switch(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD),
+                disableAnalyticsReporting = switch(SettingsContract.KEY_DISABLE_ANALYTICS_REPORTING),
                 username = username,
                 userId = userId,
                 categoryModes = modes,

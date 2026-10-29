@@ -114,6 +114,10 @@ class SettingsSyncReceiver : BroadcastReceiver() {
                 SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD,
                 defaults.hideMineGameCenterCard,
             ),
+            disableAnalyticsReporting = preferences.getBoolean(
+                SettingsContract.KEY_DISABLE_ANALYTICS_REPORTING,
+                defaults.disableAnalyticsReporting,
+            ),
             username = preferences.getString(SettingsContract.KEY_USERNAME, defaults.username).orEmpty().trim(),
             userId = preferences.getString(SettingsContract.KEY_USER_ID, defaults.userId).orEmpty().trim(),
             categoryModes = SettingsContract.CATEGORIES.associateWith { category ->

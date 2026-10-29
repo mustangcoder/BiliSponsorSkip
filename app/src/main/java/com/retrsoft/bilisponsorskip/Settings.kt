@@ -29,6 +29,7 @@ internal data class SettingsSnapshot(
     val hideBottomMallTab: Boolean = true,
     val hideBottomPublishTab: Boolean = true,
     val hideMineGameCenterCard: Boolean = true,
+    val disableAnalyticsReporting: Boolean = false,
     val username: String = "",
     val userId: String = "",
     val categoryModes: Map<String, CategoryMode> = SettingsContract.DEFAULT_CATEGORY_MODES,
@@ -69,6 +70,7 @@ internal fun SettingsSnapshot.booleanSettings(): Map<String, Boolean> = linkedMa
     SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB to hideBottomMallTab,
     SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB to hideBottomPublishTab,
     SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD to hideMineGameCenterCard,
+    SettingsContract.KEY_DISABLE_ANALYTICS_REPORTING to disableAnalyticsReporting,
 )
 
 internal class SettingsRepository(
@@ -124,6 +126,7 @@ internal class SettingsRepository(
             .putBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, snapshot.hideBottomMallTab)
             .putBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, snapshot.hideBottomPublishTab)
             .putBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, snapshot.hideMineGameCenterCard)
+            .putBoolean(SettingsContract.KEY_DISABLE_ANALYTICS_REPORTING, snapshot.disableAnalyticsReporting)
             .putString(SettingsContract.KEY_USERNAME, snapshot.username)
             .putString(SettingsContract.KEY_USER_ID, snapshot.userId)
             .apply {
@@ -143,6 +146,7 @@ internal class SettingsRepository(
         if (changed) onSettingsChanged?.invoke()
         Log.d(
             "embedded settings updated: enabled=${snapshot.enabled}; " +
+                "analyticsBlocking=${snapshot.disableAnalyticsReporting}; " +
                 "submission=${snapshot.showSubmissionButton}; " +
                 "userIdConfigured=${Identity.isValid(snapshot.userId)}",
         )
@@ -163,6 +167,7 @@ internal class SettingsRepository(
         current = loadCurrentSettings()
         Log.d(
             "settings initialized: mirror=${mirrorPreferences.getBoolean(MIRROR_READY, false)}; " +
+                "analyticsBlocking=${current.disableAnalyticsReporting}; " +
                 "submission=${current.showSubmissionButton}; " +
                 "userIdConfigured=${Identity.isValid(current.userId)}",
         )
@@ -214,6 +219,7 @@ internal class SettingsRepository(
                 if (changed) onSettingsChanged?.invoke()
                 Log.d(
                     "settings mirror updated: submission=${current.showSubmissionButton}; " +
+                        "analyticsBlocking=${current.disableAnalyticsReporting}; " +
                         "userIdConfigured=${Identity.isValid(current.userId)}",
                 )
                 onLocalStatsSyncRequested?.invoke()
@@ -271,6 +277,7 @@ internal class SettingsRepository(
         hideBottomMallTab = getBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, true),
         hideBottomPublishTab = getBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, true),
         hideMineGameCenterCard = getBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, true),
+        disableAnalyticsReporting = getBoolean(SettingsContract.KEY_DISABLE_ANALYTICS_REPORTING, false),
         username = getString(SettingsContract.KEY_USERNAME, "").trim(),
         userId = getString(SettingsContract.KEY_USER_ID, "").trim(),
         categoryModes = SettingsContract.CATEGORIES.associateWith { category ->
@@ -326,6 +333,7 @@ internal object SettingsContract {
     const val KEY_HIDE_BOTTOM_MALL_TAB = "hide_bottom_mall_tab"
     const val KEY_HIDE_BOTTOM_PUBLISH_TAB = "hide_bottom_publish_tab"
     const val KEY_HIDE_MINE_GAME_CENTER_CARD = "hide_mine_game_center_card"
+    const val KEY_DISABLE_ANALYTICS_REPORTING = "disable_analytics_reporting"
     const val KEY_USER_ID = "user_id"
     const val KEY_USERNAME = "username"
     const val ACTION_UPDATE_SETTINGS = "com.retrsoft.bilisponsorskip.UPDATE_SETTINGS"
@@ -391,6 +399,9 @@ internal object SettingsContract {
         else -> CategoryMode.MANUAL_SKIP
     }
 
+    fun readBooleanSettingsForSync(getBoolean: (String, Boolean) -> Boolean): Map<String, Boolean> =
+        SettingsSnapshot().booleanSettings().mapValues { (key, default) -> getBoolean(key, default) }
+
     fun settingsBundle(snapshot: SettingsSnapshot) = Bundle().apply {
         snapshot.booleanSettings().forEach(::putBoolean)
         putString(KEY_MIN_DURATION, snapshot.minDurationSeconds.toString())
@@ -421,6 +432,7 @@ internal object SettingsContract {
         KEY_HIDE_BOTTOM_MALL_TAB,
         KEY_HIDE_BOTTOM_PUBLISH_TAB,
         KEY_HIDE_MINE_GAME_CENTER_CARD,
+        KEY_DISABLE_ANALYTICS_REPORTING,
     )
 
     val STRING_SETTING_KEYS: List<String>

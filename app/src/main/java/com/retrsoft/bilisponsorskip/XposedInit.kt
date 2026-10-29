@@ -149,6 +149,10 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
             ComposeBottomTabHook(settings, lpparam.classLoader).install()
         }.onFailure { Log.e("failed to install compose bottom tab filter", it) }
 
+        runCatching {
+            AnalyticsBlockingHook(settings, lpparam.classLoader).install()
+        }.onFailure { Log.e("failed to install analytics blocking hooks", it) }
+
         Thread({
             runCatching { playerNotice.install() }
                 .onFailure { Log.e("failed to install interactive player notice bridge", it) }

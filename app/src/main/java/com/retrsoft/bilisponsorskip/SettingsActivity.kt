@@ -152,6 +152,8 @@ class SettingsActivity : AppCompatActivity() {
                 "移除底部导航中间的“＋”发布按钮，其余入口自动均分", true))
             addPreference(toggle(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, "隐藏“游戏中心”卡片",
                 "移除“我的”页面中的游戏中心标题、推荐位和游戏入口", true))
+            addPreference(toggle(SettingsContract.KEY_DISABLE_ANALYTICS_REPORTING, "禁用行为统计上报",
+                "阻止点击、曝光、页面和播放器行为埋点；保留历史、心跳、支付和上传接口", false))
             addPreference(ListPreference(host).apply {
                 key = SettingsContract.KEY_MIN_DURATION
                 title = "最短片段时长"
@@ -569,26 +571,8 @@ class SettingsActivity : AppCompatActivity() {
     private fun settingsBundle(): Bundle {
         val preferences = modulePreferences()
         return Bundle().apply {
-            putBoolean(SettingsContract.KEY_ENABLED, preferences.getBoolean(SettingsContract.KEY_ENABLED, true))
-            putBoolean(SettingsContract.KEY_NOTIFY_FOUND, preferences.getBoolean(SettingsContract.KEY_NOTIFY_FOUND, true))
-            putBoolean(SettingsContract.KEY_NOTIFY_SKIPPED, preferences.getBoolean(SettingsContract.KEY_NOTIFY_SKIPPED, true))
-            putBoolean(SettingsContract.KEY_NOTIFY_FETCH_FAILURE, preferences.getBoolean(SettingsContract.KEY_NOTIFY_FETCH_FAILURE, false))
-            putBoolean(SettingsContract.KEY_SHOW_TITLE_LABEL, preferences.getBoolean(SettingsContract.KEY_SHOW_TITLE_LABEL, true))
-            putBoolean(SettingsContract.KEY_SHOW_PROGRESS_MARKERS, preferences.getBoolean(SettingsContract.KEY_SHOW_PROGRESS_MARKERS, true))
-            putBoolean(SettingsContract.KEY_SKIP_ON_SEEK, preferences.getBoolean(SettingsContract.KEY_SKIP_ON_SEEK, true))
+            SettingsContract.readBooleanSettingsForSync(preferences::getBoolean).forEach(::putBoolean)
             putString(SettingsContract.KEY_MIN_DURATION, preferences.getString(SettingsContract.KEY_MIN_DURATION, "0"))
-            putBoolean(SettingsContract.KEY_SHOW_SUBMISSION_BUTTON, preferences.getBoolean(SettingsContract.KEY_SHOW_SUBMISSION_BUTTON, false))
-            putBoolean(SettingsContract.KEY_HIDE_DETAIL_AD_BANNER, preferences.getBoolean(SettingsContract.KEY_HIDE_DETAIL_AD_BANNER, true))
-            putBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, preferences.getBoolean(SettingsContract.KEY_SKIP_COLD_START_SPLASH_AD, true))
-            putBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, preferences.getBoolean(SettingsContract.KEY_SKIP_HOT_START_SPLASH_AD, true))
-            putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_ADS, true))
-            putBoolean(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS, preferences.getBoolean(SettingsContract.KEY_HIDE_HOME_FEED_LIVE_CARDS, true))
-            putBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, preferences.getBoolean(SettingsContract.KEY_SKIP_STORY_FEED_ADS, true))
-            putBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_DETAIL_RELATE_ADS, true))
-            putBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, preferences.getBoolean(SettingsContract.KEY_HIDE_PAUSE_ADS, true))
-            putBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, preferences.getBoolean(SettingsContract.KEY_HIDE_BOTTOM_MALL_TAB, true))
-            putBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, preferences.getBoolean(SettingsContract.KEY_HIDE_BOTTOM_PUBLISH_TAB, true))
-            putBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, preferences.getBoolean(SettingsContract.KEY_HIDE_MINE_GAME_CENTER_CARD, true))
             putString(SettingsContract.KEY_USER_ID, preferences.getString(SettingsContract.KEY_USER_ID, ""))
             putString(SettingsContract.KEY_USERNAME, preferences.getString(SettingsContract.KEY_USERNAME, ""))
             SettingsContract.CATEGORIES.forEach { category ->
