@@ -109,7 +109,9 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         }.onFailure { Log.e("failed to install Bili settings entry hook", it) }
 
         runCatching {
-            VideoIdentityHook(lpparam.classLoader, controller).install()
+            val identityHook = VideoIdentityHook(lpparam.classLoader, controller)
+            uiLifecycle.attachIdentity(identityHook)
+            identityHook.install()
         }.onFailure { Log.e("failed to install video identity hooks", it) }
 
         runCatching {
@@ -229,6 +231,12 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
 
     private class UiLifecycleRelay {
         @Volatile
+        private var identityHook: VideoIdentityHook? = null
+
+        fun attachIdentity(identityHook: VideoIdentityHook) {
+            this.identityHook = identityHook
+        }
+        @Volatile
         private var playerUi: PlayerUiInjector? = null
 
         @Volatile
@@ -253,6 +261,7 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         }
 
         fun onActivityResumed(activity: Activity) {
+            identityHook?.onActivityResumed(activity)
             playerUi?.onActivityResumed(activity)
             submissionUi?.onActivityResumed(activity)
             detailAdBannerUi?.onActivityResumed(activity)
@@ -260,6 +269,7 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         }
 
         fun onActivityPaused(activity: Activity) {
+            identityHook?.onActivityPaused(activity)
             playerUi?.onActivityPaused(activity)
             submissionUi?.onActivityPaused(activity)
             detailAdBannerUi?.onActivityPaused(activity)
@@ -267,6 +277,7 @@ class XposedInit : IXposedHookLoadPackage, IXposedHookZygoteInit {
         }
 
         fun onActivityDestroyed(activity: Activity) {
+            identityHook?.onActivityDestroyed(activity)
             playerUi?.onActivityDestroyed(activity)
             submissionUi?.onActivityDestroyed(activity)
             detailAdBannerUi?.onActivityDestroyed(activity)
