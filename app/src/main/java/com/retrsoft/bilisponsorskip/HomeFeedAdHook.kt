@@ -3,6 +3,13 @@ package com.retrsoft.bilisponsorskip
 import de.robv.android.xposed.XC_MethodHook
 import de.robv.android.xposed.XposedBridge
 import de.robv.android.xposed.XposedHelpers
+import java.lang.reflect.Method
+
+internal fun selectHomeFeedParserMethods(methods: List<Method>): List<Method> = methods.filter { method ->
+    method.name == "c" && method.parameterTypes.size == 1 &&
+        method.parameterTypes[0].name == "com.alibaba.fastjson.JSONArray" &&
+        List::class.java.isAssignableFrom(method.returnType)
+}
 
 internal fun readHomeFeedCardSignals(
     item: Any,
@@ -35,33 +42,39 @@ internal class HomeFeedAdHook(
     private val classLoader: ClassLoader,
 ) {
     fun install() {
-        installLegacyParserHook()
-        installAdapterSubmissionHook()
+        val parserInstalled = runCatching { installLegacyParserHook() }
+            .onFailure { Log.e("failed to install home feed parser filter", it) }.isSuccess
+        val adapterInstalled = runCatching { installAdapterSubmissionHook() }
+            .onFailure { Log.e("failed to install home feed adapter filter", it) }.isSuccess
+        if (!parserInstalled && !adapterInstalled) error("home feed filter entries not found")
     }
 
     private fun installLegacyParserHook() {
-        val parserClass = XposedHelpers.findClassIfExists(PARSER_CLASS, classLoader)
-            ?: error("Pegasus feed parser class not found")
-        val hooked = XposedBridge.hookAllMethods(
-            parserClass,
-            PARSER_METHOD,
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    val current = settings.current
-                    if (!current.enabled || (!current.hideHomeFeedAds && !current.hideHomeFeedLiveCards)) return
-                    @Suppress("UNCHECKED_CAST")
-                    val items = param.result as? MutableList<Any?> ?: return
-                    filterInPlace(
-                        items,
-                        "parser",
-                        hideAds = current.hideHomeFeedAds,
-                        hideLiveCards = current.hideHomeFeedLiveCards,
-                    )
-                }
-            },
-        )
-        if (hooked.isEmpty()) error("Pegasus feed parser method not found")
-        Log.d("home feed ad filter hook installed: $PARSER_CLASS.$PARSER_METHOD")
+        val methods = PARSER_CLASSES.flatMap { className ->
+            val parserClass = XposedHelpers.findClassIfExists(className, classLoader) ?: return@flatMap emptyList()
+            selectHomeFeedParserMethods(parserClass.declaredMethods.asList())
+        }
+        if (methods.isEmpty()) error("Pegasus feed parser methods not found")
+        methods.forEach { method ->
+            XposedBridge.hookMethod(
+                method,
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        val current = settings.current
+                        if (!current.enabled || (!current.hideHomeFeedAds && !current.hideHomeFeedLiveCards)) return
+                        @Suppress("UNCHECKED_CAST")
+                        val items = param.result as? MutableList<Any?> ?: return
+                        filterInPlace(
+                            items,
+                            "parser",
+                            hideAds = current.hideHomeFeedAds,
+                            hideLiveCards = current.hideHomeFeedLiveCards,
+                        )
+                    }
+                },
+            )
+            Log.d("home feed ad filter hook installed: ${method.declaringClass.name}.${method.name}")
+        }
     }
 
     private fun installAdapterSubmissionHook() {
@@ -123,8 +136,7 @@ internal class HomeFeedAdHook(
     }
 
     private companion object {
-        const val PARSER_CLASS = "com.bilibili.pegasus.api.i"
-        const val PARSER_METHOD = "c"
+        val PARSER_CLASSES = listOf("com.bilibili.pegasus.api.i", "com.bilibili.pegasus.api.k")
         const val FEED_COLLECTOR_CLASS = "com.bilibili.pegasus.PegasusFragment\$initFeeds\$3\$1"
     }
 }

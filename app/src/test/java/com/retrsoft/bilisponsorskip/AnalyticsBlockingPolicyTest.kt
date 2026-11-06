@@ -55,9 +55,11 @@ class AnalyticsBlockingPolicyTest {
     fun sharedNeuronHookUsesTheEventArgumentToPreserveDiagnostics() {
         val settings = SettingsSnapshot(disableAnalyticsReporting = true)
         listOf("trackT", "trackTInCurrentProcess").forEach { method ->
-            assertFalse(
-                shouldBlockNeuronCall(settings, method, arrayOf(false, "infra.xcrash", emptyMap<String, String>(), 1, null)),
-            )
+            listOf("infra.crash", "infra.xcrash", "infra.net", "infra.setup", "infra.webimage").forEach { eventId ->
+                assertFalse(
+                    shouldBlockNeuronCall(settings, method, arrayOf(false, eventId, emptyMap<String, String>(), 1, null)),
+                )
+            }
             assertTrue(
                 shouldBlockNeuronCall(settings, method, arrayOf(false, "main.homepage.0.0.show", emptyMap<String, String>(), 1, null)),
             )
@@ -72,15 +74,35 @@ class AnalyticsBlockingPolicyTest {
     fun builderPreservesUnrecognizedPayloadAndOnlyBlocksIdentifiedEvents() {
         val settings = SettingsSnapshot(disableAnalyticsReporting = true)
         val behavior = VerifiedBuilder("main.homepage.bottombar.0.click")
-        val diagnostic = VerifiedBuilder("infra.net")
-
         assertTrue(shouldBlockNeuronBuilder(settings, behavior))
-        assertFalse(shouldBlockNeuronBuilder(settings, diagnostic))
+        listOf("infra.crash", "infra.xcrash", "infra.net", "infra.setup", "infra.webimage").forEach { eventId ->
+            assertFalse(shouldBlockNeuronBuilder(settings, VerifiedBuilder(eventId)))
+        }
         assertFalse(shouldBlockNeuronBuilder(settings, VerifiedBuilder(null)))
         assertFalse(shouldBlockNeuronBuilder(settings, VerifiedBuilder("")))
-        assertThrows(NoSuchFieldException::class.java) { shouldBlockNeuronBuilder(settings, Any()) }
+        assertFalse(shouldBlockNeuronBuilder(settings, Any()))
+        assertThrows(NoSuchFieldException::class.java) { shouldBlockNeuronBuilder(settings, MissingEventBuilder()) }
         assertFalse(shouldBlockNeuronBuilder(settings.copy(enabled = false), behavior))
         assertFalse(shouldBlockNeuronBuilder(settings.copy(disableAnalyticsReporting = false), behavior))
+    }
+
+    @Test
+    fun builderBlockingRejectsReusedObfuscatedClassWithoutSubmitContract() {
+        val settings = SettingsSnapshot(disableAnalyticsReporting = true)
+
+        assertFalse(shouldBlockNeuronBuilder(settings, OverridesGate(null, null, "apm", null)))
+        assertFalse(shouldBlockNeuronBuilder(settings, SubmitWithArgument()))
+        assertFalse(shouldBlockNeuronBuilder(settings, SubmitWithResult()))
+        assertFalse(shouldBlockNeuronBuilder(settings, StaticSubmit()))
+    }
+
+    @Test
+    fun builderRejectsChangedEventFieldMapping() {
+        val settings = SettingsSnapshot(disableAnalyticsReporting = true)
+
+        assertThrows(IllegalStateException::class.java) {
+            shouldBlockNeuronBuilder(settings, IncorrectEventBuilder())
+        }
     }
 
     @Test
@@ -107,5 +129,31 @@ class AnalyticsBlockingPolicyTest {
         assertTrue(NEURON_BUILDER_ANALYTICS_METHODS == setOf("submit"))
     }
 
-    private class VerifiedBuilder(@JvmField val c: String?)
+    private class VerifiedBuilder(@JvmField val c: String?) {
+        fun submit() = Unit
+    }
+
+    private class MissingEventBuilder {
+        fun submit() = Unit
+    }
+
+    private class OverridesGate(val a: String?, val b: String?, @JvmField val c: String?, val d: String?)
+
+    private class SubmitWithArgument(@JvmField val c: String = "event") {
+        fun submit(eventId: String) = Unit
+    }
+
+    private class SubmitWithResult(@JvmField val c: String = "event") {
+        fun submit(): String = c
+    }
+
+    private class IncorrectEventBuilder(@JvmField val c: Long = 1) {
+        fun submit() = Unit
+    }
+
+    private class StaticSubmit(@JvmField val c: String = "event") {
+        companion object {
+            @JvmStatic fun submit() = Unit
+        }
+    }
 }
