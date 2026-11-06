@@ -16,9 +16,15 @@ internal fun selectDetailComponentMethods(
     methods: List<Method>,
     itemClassName: String,
     resultClassName: String,
+): List<Method> = selectDetailComponentMethods(methods, setOf(itemClassName), resultClassName)
+
+internal fun selectDetailComponentMethods(
+    methods: List<Method>,
+    itemClassNames: Set<String>,
+    resultClassName: String,
 ): List<Method> = methods.filter { method ->
     method.parameterTypes.size == 1 &&
-        method.parameterTypes[0].name == itemClassName &&
+        method.parameterTypes[0].name in itemClassNames &&
         method.returnType.name == resultClassName
 }
 
@@ -44,8 +50,6 @@ internal class DetailRelateAdFilterHook(
     fun install() {
         val serviceClass = XposedHelpers.findClassIfExists(DETAIL_RELATE_SERVICE_CLASS, classLoader)
             ?: error("Detail relate service class not found")
-        XposedHelpers.findClassIfExists(DETAIL_RELATE_ITEM_CLASS, classLoader)
-            ?: error("Detail relate item class not found")
         XposedHelpers.findClassIfExists(DETAIL_RELATE_TYPE_CLASS, classLoader)
             ?: error("Detail relate type class not found")
         XposedHelpers.findClassIfExists(RUNNING_COMPONENT_CLASS, classLoader)
@@ -54,7 +58,7 @@ internal class DetailRelateAdFilterHook(
         val method = requireSingleDetailComponentMethod(
             selectDetailComponentMethods(
                 methods = serviceClass.declaredMethods.asList(),
-                itemClassName = DETAIL_RELATE_ITEM_CLASS,
+                itemClassNames = DETAIL_RELATE_ITEM_CLASSES,
                 resultClassName = RUNNING_COMPONENT_CLASS,
             ),
         )
@@ -73,8 +77,10 @@ internal class DetailRelateAdFilterHook(
     private companion object {
         const val DETAIL_RELATE_SERVICE_CLASS =
             "com.bilibili.ship.theseus.united.page.intro.module.relate.DetailRelateService"
-        const val DETAIL_RELATE_ITEM_CLASS =
-            "com.bilibili.ship.theseus.united.page.intro.module.relate.B0"
+        val DETAIL_RELATE_ITEM_CLASSES = setOf(
+            "com.bilibili.ship.theseus.united.page.intro.module.relate.B0",
+            "com.bilibili.ship.theseus.united.page.intro.module.relate.D0",
+        )
         const val RUNNING_COMPONENT_CLASS = "com.bilibili.app.gemini.ui.RunningUIComponent"
     }
 }

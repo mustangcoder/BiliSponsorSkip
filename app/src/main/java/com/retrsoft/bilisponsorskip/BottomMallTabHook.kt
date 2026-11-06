@@ -53,29 +53,37 @@ internal class BottomMallTabHook(
     }
 
     private fun installResolvedTabHook(): Int {
-        val providerClass = XposedHelpers.findClassIfExists(RESOLVED_TAB_PROVIDER, classLoader) ?: return 0
-        return XposedBridge.hookAllMethods(
-            providerClass,
-            "a",
-            object : XC_MethodHook() {
-                override fun afterHookedMethod(param: MethodHookParam) {
-                    val current = settings.current
-                    if (!current.enabled || (!current.hideBottomMallTab && !current.hideBottomPublishTab)) return
-                    @Suppress("UNCHECKED_CAST")
-                    val tabs = param.result as? MutableList<Any?> ?: return
-                    val before = tabs.size
-                    tabs.removeAll { wrapper ->
-                        val tab = wrapper?.objectFieldOrNull("c") ?: return@removeAll false
-                        shouldHideBottomTab(
-                            tab = tab.identity(),
-                            hideMall = current.hideBottomMallTab,
-                            hidePublish = current.hideBottomPublishTab,
-                        )
+        val methods = RESOLVED_TAB_PROVIDERS.flatMap { className ->
+            val providerClass = XposedHelpers.findClassIfExists(className, classLoader) ?: return@flatMap emptyList()
+            providerClass.declaredMethods.filter { method ->
+                method.name == "a" && method.parameterTypes.isEmpty() &&
+                    List::class.java.isAssignableFrom(method.returnType)
+            }
+        }
+        methods.forEach { method ->
+            XposedBridge.hookMethod(
+                method,
+                object : XC_MethodHook() {
+                    override fun afterHookedMethod(param: MethodHookParam) {
+                        val current = settings.current
+                        if (!current.enabled || (!current.hideBottomMallTab && !current.hideBottomPublishTab)) return
+                        @Suppress("UNCHECKED_CAST")
+                        val tabs = param.result as? MutableList<Any?> ?: return
+                        val before = tabs.size
+                        tabs.removeAll { wrapper ->
+                            val tab = wrapper?.objectFieldOrNull("c") ?: return@removeAll false
+                            shouldHideBottomTab(
+                                tab = tab.identity(),
+                                hideMall = current.hideBottomMallTab,
+                                hidePublish = current.hideBottomPublishTab,
+                            )
+                        }
+                        if (tabs.size != before) Log.d("bottom mall tab filtered: provider=resolved")
                     }
-                    if (tabs.size != before) Log.d("bottom mall tab filtered: provider=resolved")
-                }
-            },
-        ).size
+                },
+            )
+        }
+        return methods.size
     }
 
     private fun Any.identity() = readBottomTabIdentity(this, XposedBottomTabReader)
@@ -98,6 +106,6 @@ internal class BottomMallTabHook(
             "tv.danmaku.bili.ui.main2.resource.C",
             "tv.danmaku.bili.ui.main2.resource.k",
         )
-        const val RESOLVED_TAB_PROVIDER = "tv.danmaku.bili.ui.main2.Z"
+        val RESOLVED_TAB_PROVIDERS = listOf("tv.danmaku.bili.ui.main2.Z", "tv.danmaku.bili.ui.main2.e0")
     }
 }
